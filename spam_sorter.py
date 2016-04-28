@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from sklearn.cross_validation import train_test_split
-from sklearn.feature_extraction.text import CountVectorizer
 # from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import make_pipeline
@@ -30,46 +29,22 @@ df = pd.read_csv('spambase_data.csv', names=columns)
 X_ham = df[df['spam'] == 0]
 X_spam = df[df['spam'] == 1]
 
-# spam_column = df.pop('spam')
-# x_ham = x_ham.drop('spam', axis=1)
-# x_spam = x_spam.drop('spam', axis=1)
-# y_ham = ['ham'] * len(x_ham)
-# y_spam = ['ham'] * len(x_spam)
-# print(len(x_ham)+len(x_spam))
-# print(len(y_ham)+len(y_spam))
+y = df.spam
 
-X_ham_train, X_ham_test = (train_test_split(
-                           X_ham, test_size=0.4, random_state=101))
+X_ham = df.drop('spam', 1)
+X_spam = df.drop('spam', 1)
 
-X_spam_train, X_spam_test = (train_test_split(
-                             X_spam, test_size=0.4, random_state=101))
+X_train, X_test, y_train, y_test = (train_test_split(X_ham + X_spam,
+                                    y, test_size=0.4, random_state=101))
 
-
-y_train = ['ham'] * len(X_ham_train) + ['spam'] * len(X_spam_train)
-y_test = ['ham'] * len(X_ham_test) + ['spam'] * len(X_spam_test)
-X_train = X_ham_train + X_spam_train
-X_test = X_ham_test + X_spam_test
-
-
-print(len(X_train))
-print(len(X_test))
-print(len(y_train))
-print(len(y_test))
-
-model = make_pipeline(CountVectorizer(), MultinomialNB())
-
-print(len(X_train))
-print(len(X_test))
-print(len(y_train))
-print(len(y_test))
-
+model = make_pipeline(MultinomialNB())
 
 model.fit(X_train, y_train)
 
-# print('Train score is:', model.score(X_train, y_train))
-# print('Test score is:', model.score(X_test, y_test))
+print('Train score is:', model.score(X_train, y_train))
+print('Test score is:', model.score(X_test, y_test))
 
-# predictions = model.predict(ham_test)
-# print(list(predictions))
-# predictions = model.predict(spam_test)
-# print(list(predictions))
+# predictions = model.predict(X_test)
+# print(list(predictions).sum())
+# predictions = model.predict(X_train)
+# print(list(predictions).sum())
